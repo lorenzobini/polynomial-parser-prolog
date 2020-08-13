@@ -1,12 +1,8 @@
-%%%% 806980 Bini Lorenzo
-%%%% //
-
 
 % coefficients(Poly, Coefficients)
-% true se Coefficients e' la lista composta dai coefficienti di Poly
-% disposti secondo la posizione del rispettivo monomio in seguito
-% all'ordinamento e alla normalizzazione del polinomio. I duplicati non
-% vengono eliminati.
+% Returns TRUE if: Coefficients is the list of the coefficients in Poly 
+% 				   ordered according to the position of the respective monomial in Poly
+% 				   after the sorting and normalisation process.
 
 coefficients(poly([]), []) :- !.
 coefficients(poly(Mons), Rs) :-
@@ -40,8 +36,7 @@ coefficients(P, R) :-
 
 
 % variables(Poly, Variables).
-% true se Variables è la lista ordinata di simboli di variabile unici
-% che costituiscono le variabili contenute in Poly
+% Returns TRUE if: Variables is the ordered list of unique symbols in Poly
 
 variables(poly([m(_,_,[])]), []) :- !.
 variables(poly([]), []) :- !.
@@ -89,7 +84,7 @@ variables(M1, R) :-
 
 
 % monomials(Poly, Monomials).
-% true quando Monomials è la lista ordinata
+% Returns TRUE if: Monomials is the ordered list of the monomials in Poly
 
 monomials(Mon, R) :-
 	is_monomial(Mon),
@@ -107,8 +102,7 @@ monomials(P, R) :-
 
 
 % maxdegree(Poly, Degree).
-% true quando Degree è il massimo grado dei monomi
-% che appaiono in Poly
+% Returns TRUE if: Degree is the highest degree amongst the monomials in Poly
 
 maxdegree([],0) :- !.
 maxdegree(Mon, Degree) :-
@@ -131,8 +125,7 @@ find_degrees([m(_,X,_)|Ys], [X|Ms]) :-
 	find_degrees(Ys, Ms).
 
 % min_degree(Poly, Degree).
-% true quando Degree è il minimo grado dei monomi
-% che appaiono in Poly
+% Returns TRUE if: Degree is the lowest degree amongst the monomials in Poly
 
 mindegree([], 0) :- !.
 mindegree(Mon, Degree) :-
@@ -149,8 +142,7 @@ mindegree(P, Degree) :-
 
 
 % polyplus(Poly1, Poly2, Result).
-% true se Result è la somma tra Poly1 e Poly2
-% i cui monomi risultanti sono correttamente ordinati
+% Returns TRUE if: Result is equal to the sum between Poly1 and Poly2 
 
 polyplus(poly([]), poly([]), poly([])) :- !.
 polyplus(poly(Mons), poly([]), poly(Mons)) :-
@@ -176,8 +168,7 @@ polyplus(M1, M2, R) :-
 
 
 % polyminus(Poly1, Poly2, Result).
-% true se Result è la differenza tra Poly1 e Poly2
-% i cui monomi risultanti sono correttamente ordinati
+% Returns TRUE if: Result is equal to the difference between Poly1 and Poly2 
 
 polyminus(poly([]), poly([]), poly([])) :- !.
 polyminus(poly(Mons), poly([]), poly(Mons)) :-
@@ -205,8 +196,7 @@ polyminus(M1, M2, R) :-
 
 
 % polytimes(Poly1, Poly2, Result).
-% true se Result è il prodotto tra Poly1 e Poly2
-% i cui monomi sono stati correttamente ordinati
+% Returns TRUE if: Result is equal to the product between Poly1 and Poly2 
 
 polytimes(poly([]), poly([]), poly([])) :- !.
 polytimes(poly(_Mons), poly([]), poly([])) :- !.
@@ -263,15 +253,15 @@ multiply_mons(M1, [M2|Ms], [R|Rs]) :-
 
 
 % as_monomial(Expression, Monomial)
-% ritorna la rappresentazione ordinata Monomial del
-% monomio Expression dove:
-% Monomial = m(Coefficient, TotalDegree, [VarsPower])
+% Returns: the ordered representation Monomial of the monomial Expression
+%		   where Expression is in the form:
+% 		   Monomial = m(Coefficient, TotalDegree, [VarsPower])
 
 
-as_monomial(X, m(X, 0, [])) :- number(X).
+as_monomial(X, m(X, 0, [ ])) :- number(X).
 as_monomial(-X, m(-1, 1, [v(1, X)])) :- atom(X).
 as_monomial(X, m(1, 1, [v(1, X)])) :- atom(X).
-as_monomial(^(X, Y), m(1, 0, [])) :-
+as_monomial(^(X, Y), m(1, 0, [ ])) :-
 	atom(X), number(Y), Y == 0, !.
 as_monomial(-X^Y, m(-1, Y, [v(Y, X)])) :-
 	atom(X), number(Y).
@@ -314,9 +304,9 @@ normalize_mons([v(G, T), v(G1, T1)|Vs], Ms) :-
 
 
 % as_polynomial(Expression, Polynomial)
-% ritorna la rappresentazione ordinata Polynomial del
-% monomio Expression dove:
-% Polynomial = poly([Monomials])
+% Returns: the ordered representation Polynomial of the polynomial Expression
+%		   where Expression is in the form:
+% 		   Polynomial = poly([Monomials])
 
 as_polynomial(X, poly([M])) :-
 	number(X), !, as_monomial(X, M).
@@ -396,15 +386,14 @@ equal_mons([v(G1, T1)|Vs1], [v(G2, T2)|Vs2]) :-
 
 
 % polyval(Poly, VariablesValue, Value).
-% true se Value corrisponde al valore del polinomio Poly calcolato
-% nel punto n-dimensionale (con n uguale al numero di variabili)
-% rappresentato dalla lista VariablesValue.
-% Si assume che i valori di VariablesValue siano ordinati coerentemente
-% con l'ordine lessicografico delle variabili.
+% Returns TRUE if: Value is equal to the value of Poly calculated
+%				   in the n-dimentional point represented by VariablesValue
+% It is assumed that the values in VariablesValue are ordered according
+% to the lexicographical order of the variables in Poly
 
 
-polyval([], [], 0) :- !.
-polyval(m(C, 0, []), [], C) :- !.
+polyval([ ], [ ], 0) :- !.
+polyval(m(C, 0, [ ]), [], C) :- !.
 polyval(Mon, VV, Value) :-
 	is_monomial(Mon),
 	polyval(poly([Mon]), VV, Value).
@@ -425,7 +414,7 @@ polyval(P, VV, Value) :-
 
 
 evaluate_poly([], _, _, 0) :- !.
-evaluate_poly([m(C, _, [])], _, _, C) :- !.
+evaluate_poly([m(C, _, [ ])], _, _, C) :- !.
 evaluate_poly(Mons, [V1|Vs], [VV1|VVs], Value) :-
 	Mons = [m(C, Td, Vps)|Ms],
 	Vps == [], !,
@@ -447,8 +436,7 @@ evaluate_poly(Mons, [V1|Vs], [VV1|VVs], Value) :-
 
 
 % pprint_polynomial(Polynomial).
-% true se stampa sullo standard output una rappresentazione tradizionale
-% del polinomio Polynomial. I simboli di moltiplicazione vengono omessi.
+% Returns TRUE if: prints on screen the human-readable version of Polynomial
 
 pprint_polynomial(poly([])) :- !.
 pprint_polynomial(poly([m(0, 0, [])])) :-
@@ -497,7 +485,7 @@ pprint_polynomial(Poly) :-
 
 
 
-%---------Algoritmo MERGE SORT
+%--------- MERGE SORT
 
 
 
@@ -609,10 +597,7 @@ hv([H|T], Acc, [H|L], B) :- hv(T, [_|Acc], L, B).
 
 
 
-% is_trad_poly(Poly).
-% true quando Poly è un polinomio scritto in forma tradizionale.
-% Somma o differenza tra monomi, monomio numerico, letterale o
-% letterale elevato a potenza.
+% SUPPORT FUNCTIONS
 
 is_trad_poly(P) :-
 	number(P), !.
@@ -636,9 +621,6 @@ is_trad_poly(-(X, Y)) :-
 	is_trad_poly(X),
 	is_trad_poly(Y).
 
-% invert_coefficient(M, Mi).
-% inverte il segno del coefficiente del monomio M
-% nel caso di differenza tra monomi.
 
 invert_coefficient([], []).
 invert_coefficient(m(C, Td, Vps), m(-C, Td, Vps)).
@@ -650,10 +632,6 @@ invert_coefficient(M, Mi) :-
 	as_monomial(M, Mp),
 	Mp = m(C, Td, Vps),
 	Mi = m(-C, Td, Vps).
-
-
-%% -----Librerie utili per l'implementazione delle funzioni
-
 
 
 is_monomial(m(_C,TD,VPs)) :-
